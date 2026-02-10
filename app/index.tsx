@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, Touchabl
 import { Onboarding } from '@/components/Onboarding';
 import { BakuCharacter } from '@/components/BakuCharacter';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProgress } from '@/contexts/ProgressContext';
 import { processWorry } from '@/data/api';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,6 +11,7 @@ type BakuState = 'SLEEPING' | 'WAKING' | 'EATING' | 'PROCESSING' | 'IDLE';
 
 export default function HomeScreen() {
     const { user, loading, hasSeenOnboarding, completeOnboarding } = useAuth();
+    const { xp, level, addXp } = useProgress();
     const [bakuState, setBakuState] = useState<BakuState>('SLEEPING');
     const [worryText, setWorryText] = useState('');
     const [response, setResponse] = useState<string | null>(null);
@@ -27,6 +29,7 @@ export default function HomeScreen() {
 
             const apiResponse = await processWorry(worryText);
 
+            await addXp(20); // Award XP
             setResponse(apiResponse);
             setBakuState('IDLE');
             setWorryText('');
@@ -57,7 +60,13 @@ export default function HomeScreen() {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <SafeAreaView style={styles.container}>
-                <Text style={styles.headerTitle}>Baku</Text>
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>Baku</Text>
+                    <View style={styles.stats}>
+                        <Text style={styles.levelText}>Lvl {level}</Text>
+                        <Text style={styles.xpText}>{xp % 100} / 100 XP</Text>
+                    </View>
+                </View>
 
                 <View style={styles.stage}>
                     <BakuCharacter state={bakuState} />
@@ -114,13 +123,31 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FDFCF0',
     },
+    header: {
+        marginTop: 10,
+        marginBottom: 10,
+        alignItems: 'center',
+    },
     headerTitle: {
         fontSize: 20,
         fontWeight: '600',
         color: '#2D2D2D',
-        textAlign: 'center',
-        marginTop: 10,
-        opacity: 0.6,
+        opacity: 0.8,
+    },
+    stats: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    levelText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#5E548E',
+        marginRight: 10,
+    },
+    xpText: {
+        fontSize: 12,
+        color: '#8AB0AB',
     },
     stage: {
         flex: 1,

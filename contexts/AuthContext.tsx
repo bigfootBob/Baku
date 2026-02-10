@@ -40,17 +40,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         checkOnboarding();
 
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
+        if (auth) {
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                setUser(user);
+                setLoading(false);
+                if (!user && auth) {
+                    signInAnonymously(auth).catch((error) => {
+                        console.error("Auto sign-in failed", error);
+                    });
+                }
+            });
+            return unsubscribe;
+        } else {
             setLoading(false);
-            if (!user) {
-                signInAnonymously(auth).catch((error) => {
-                    console.error("Auto sign-in failed", error);
-                });
-            }
-        });
-
-        return unsubscribe;
+            return () => { };
+        }
     }, []);
 
     const completeOnboarding = async () => {
@@ -64,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signIn = async () => {
         try {
-            if (!user) {
+            if (!user && auth) {
                 await signInAnonymously(auth);
             }
         } catch (error) {
