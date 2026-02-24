@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, Platform, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { Onboarding } from '@/components/Onboarding';
 import { BakuCharacter } from '@/components/BakuCharacter';
 import { useAuth } from '@/contexts/AuthContext';
@@ -58,57 +58,55 @@ export default function HomeScreen() {
     }
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <SafeAreaView style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Baku</Text>
-                    <View style={styles.stats}>
-                        <Text style={styles.levelText}>Lvl {level}</Text>
-                        <Text style={styles.xpText}>{xp % 100} / 100 XP</Text>
-                    </View>
+        <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>Baku</Text>
+                <View style={styles.stats}>
+                    <Text style={styles.levelText}>Lvl {level}</Text>
+                    <Text style={styles.xpText}>{xp % 100} / 100 XP</Text>
                 </View>
+            </View>
 
-                <View style={styles.stage}>
-                    <BakuCharacter state={bakuState} />
-                    {response && (
-                        <View style={styles.responseContainer}>
-                            <Text style={styles.responseText}>{response}</Text>
-                            <TouchableOpacity onPress={resetLoop} style={styles.resetButton}>
-                                <Text style={styles.resetButtonText}>Rest</Text>
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                </View>
-
-                {!response && (
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="What burdens you?"
-                            placeholderTextColor="#888"
-                            multiline
-                            maxLength={280}
-                            value={worryText}
-                            onChangeText={(text) => {
-                                setWorryText(text);
-                                if (bakuState === 'SLEEPING' && text.length > 0) {
-                                    setBakuState('WAKING');
-                                } else if (bakuState === 'WAKING' && text.length === 0) {
-                                    setBakuState('SLEEPING');
-                                }
-                            }}
-                        />
-                        <TouchableOpacity
-                            style={[styles.feedButton, !worryText.trim() && styles.feedButtonDisabled]}
-                            onPress={handleFeed}
-                            disabled={!worryText.trim()}
-                        >
-                            <Text style={styles.feedButtonText}>Feed</Text>
+            <View style={styles.stage}>
+                <BakuCharacter state={bakuState} />
+                {response && (
+                    <View style={styles.responseContainer}>
+                        <Text style={styles.responseText}>{response}</Text>
+                        <TouchableOpacity onPress={resetLoop} style={styles.resetButton}>
+                            <Text style={styles.resetButtonText}>Rest</Text>
                         </TouchableOpacity>
                     </View>
                 )}
-            </SafeAreaView>
-        </TouchableWithoutFeedback>
+            </View>
+
+            {!response && (
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="What burdens you?"
+                        placeholderTextColor="#888"
+                        multiline
+                        maxLength={280}
+                        value={worryText}
+                        onChangeText={(text) => {
+                            setWorryText(text);
+                            if (bakuState === 'SLEEPING' && text.length > 0) {
+                                setBakuState('WAKING');
+                            } else if (bakuState === 'WAKING' && text.length === 0) {
+                                setBakuState('SLEEPING');
+                            }
+                        }}
+                    />
+                    <TouchableOpacity
+                        style={[styles.feedButton, !worryText.trim() && styles.feedButtonDisabled]}
+                        onPress={handleFeed}
+                        disabled={!worryText.trim()}
+                    >
+                        <Text style={styles.feedButtonText}>Feed</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+        </SafeAreaView>
     );
 }
 
@@ -117,11 +115,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FDFCF0',
+        backgroundColor: '#F3EFE0', // Washi paper color
     },
     container: {
         flex: 1,
-        backgroundColor: '#FDFCF0',
+        backgroundColor: '#F3EFE0', // Washi paper color
     },
     header: {
         marginTop: 10,
@@ -129,10 +127,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#2D2D2D',
-        opacity: 0.8,
+        fontSize: 24,
+        fontWeight: '700',
+        color: '#3B2F2F', // Dark Lacquer wood
+        letterSpacing: 2,
     },
     stats: {
         flexDirection: 'row',
@@ -142,12 +140,12 @@ const styles = StyleSheet.create({
     levelText: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#5E548E',
+        color: '#8A3324', // Rust red / Vermilion
         marginRight: 10,
     },
     xpText: {
         fontSize: 12,
-        color: '#8AB0AB',
+        color: '#5B6F5F', // Muted bamboo green
     },
     stage: {
         flex: 1,
@@ -155,58 +153,68 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     responseContainer: {
-        marginTop: 30,
-        paddingHorizontal: 40,
+        marginTop: 15,
+        paddingHorizontal: 30,
         alignItems: 'center',
     },
     responseText: {
         fontSize: 18,
-        color: '#2D2D2D',
+        color: '#3B2F2F', // Dark wood text
         textAlign: 'center',
         fontStyle: 'italic',
         lineHeight: 28,
+        fontFamily: Platform.OS === 'ios' ? 'Hoefler Text' : 'serif', // Calligraphic feel
     },
     resetButton: {
         marginTop: 20,
         padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#8A3324',
     },
     resetButtonText: {
-        color: '#8AB0AB',
+        color: '#8A3324', // Vermilion red
         fontSize: 16,
+        fontWeight: '500',
+        letterSpacing: 1,
     },
     inputContainer: {
         padding: 20,
-        backgroundColor: '#FDFCF0',
+        backgroundColor: '#F3EFE0', // Match background
     },
     input: {
-        backgroundColor: '#FFF',
-        borderRadius: 16,
+        backgroundColor: '#EBE5D0', // Slightly darker washi paper for depth
+        borderRadius: 4, // More square edges
         padding: 16,
         fontSize: 16,
-        color: '#2D2D2D',
+        color: '#3B2F2F',
         minHeight: 100,
         textAlignVertical: 'top',
         borderWidth: 1,
-        borderColor: '#E6E6FA',
+        borderColor: '#C3BCA5', // Subtle border
+        shadowOpacity: 0,
     },
     feedButton: {
         marginTop: 16,
-        backgroundColor: '#E6A57E',
+        backgroundColor: '#3B2F2F', // Dark Lacquer
         paddingVertical: 16,
-        borderRadius: 30,
+        borderRadius: 4, // Square edges
         alignItems: 'center',
-        shadowColor: '#E6A57E',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        borderWidth: 1,
+        borderColor: '#211818',
     },
     feedButtonDisabled: {
-        backgroundColor: '#E0E0E0', // Gray out
+        backgroundColor: '#A39C8E', // Faded ink color
+        borderColor: '#A39C8E',
         shadowOpacity: 0,
     },
     feedButtonText: {
-        color: '#FDFCF0',
+        color: '#F3EFE0', // Light Washi text
         fontSize: 18,
         fontWeight: '600',
+        letterSpacing: 2,
     },
 });

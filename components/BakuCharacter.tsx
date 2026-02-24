@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 
 type BakuState = 'SLEEPING' | 'WAKING' | 'EATING' | 'PROCESSING' | 'IDLE';
 
@@ -8,39 +9,57 @@ interface BakuCharacterProps {
     state: BakuState;
 }
 
+// Pre-load or reference the local assets
+const images = {
+    sleep: require('@/assets/images/baku-sleep.jpg'),
+    eat: require('@/assets/images/baku-eat.jpg'),
+    wise: require('@/assets/images/baku-wise.jpg'),
+};
+
 export function BakuCharacter({ state }: BakuCharacterProps) {
-    const breath = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    const getTargetImage = (currentState: BakuState) => {
+        if (currentState === 'SLEEPING' || currentState === 'WAKING') return images.sleep;
+        if (currentState === 'EATING' || currentState === 'PROCESSING') return images.eat;
+        return images.wise; // IDLE corresponds to the wisdom state here
+    };
+
+    const targetImage = getTargetImage(state);
+    const [currentImage, setCurrentImage] = useState(targetImage);
 
     useEffect(() => {
-        if (state === 'SLEEPING') {
-            breath.value = withRepeat(
-                withTiming(1.05, { duration: 2000, easing: Easing.ease }),
-                -1,
-                true
-            );
-        } else {
-            breath.value = withTiming(1);
+        if (targetImage !== currentImage) {
+            // Fade out
+            opacity.value = withTiming(0, { duration: 400 }, (isFinished) => {
+                if (isFinished) {
+                    // Change image when fully faded out
+                    runOnJS(setCurrentImage)(targetImage);
+                    // Fade back in
+                    opacity.value = withTiming(1, { duration: 400 });
+                }
+            });
         }
-    }, [state]);
+    }, [state, targetImage, currentImage, opacity]);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ scale: breath.value }],
+            opacity: opacity.value,
         };
     });
 
     return (
         <View style={styles.container}>
             <Animated.View style={[styles.characterPlaceholder, animatedStyle]}>
-                {/* In a real app, this would be an Image or Lottie animation */}
-                <Text style={styles.emoji}>
-                    {state === 'SLEEPING' ? '💤' :
-                        state === 'EATING' ? '😋' :
-                            state === 'PROCESSING' ? '🤔' :
-                                '🦁'}
-                </Text>
-                <Text style={styles.label}>The Baku is {state.toLowerCase()}</Text>
+                <Image
+                    source={currentImage}
+                    style={styles.image}
+                    contentFit="cover"
+                />
             </Animated.View>
+            <Text style={styles.label}>
+                The Baku is {state === 'IDLE' ? 'wise' : state.toLowerCase()}
+            </Text>
         </View>
     );
 }
@@ -49,24 +68,32 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         justifyContent: 'center',
-        height: 300,
+        height: 350, // slightly taller to accommodate larger square
     },
     characterPlaceholder: {
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        backgroundColor: '#E6E6FA', // Light purple
+        width: 450,
+        height: 250,
+        borderRadius: 8, // slight rounding, but mostly square
+        backgroundColor: '#D1C7A9', // Washi paper / tatami color
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 4,
-        borderColor: '#5E548E',
+        borderWidth: 6,
+        borderColor: '#3B2F2F', // Dark wood / lacquer color
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
     },
-    emoji: {
-        fontSize: 80,
+    image: {
+        width: '100%',
+        height: '100%',
     },
     label: {
-        marginTop: 10,
-        color: '#5E548E',
+        marginTop: 20,
+        color: '#3B2F2F', // matching dark wood
         fontWeight: '600',
+        fontSize: 16,
+        letterSpacing: 1, // slightly wider spacing for elegance
     },
 });
