@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 
@@ -18,6 +18,8 @@ const images = {
 
 export function BakuCharacter({ state }: BakuCharacterProps) {
     const opacity = useSharedValue(1);
+    const { width } = useWindowDimensions();
+    const isMobile = width < 425;
 
     const getTargetImage = (currentState: BakuState) => {
         if (currentState === 'SLEEPING' || currentState === 'WAKING') return images.sleep;
@@ -49,8 +51,13 @@ export function BakuCharacter({ state }: BakuCharacterProps) {
     });
 
     return (
-        <View style={styles.container}>
-            <Animated.View style={[styles.characterPlaceholder, animatedStyle]}>
+        <View
+            style={[styles.container, isMobile && styles.containerMobile]}
+            accessible={true}
+            accessibilityLabel={`Illustration of the Baku. The Baku is ${state === 'IDLE' ? 'wise' : state.toLowerCase()}.`}
+            accessibilityLiveRegion="polite"
+        >
+            <Animated.View style={[styles.characterPlaceholder, isMobile && styles.characterPlaceholderMobile, animatedStyle]}>
                 <Image
                     source={currentImage}
                     style={styles.image}
@@ -70,6 +77,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         height: 350, // slightly taller to accommodate larger square
     },
+    containerMobile: {
+        height: 250, // shorter on mobile
+    },
     characterPlaceholder: {
         width: 450,
         height: 250,
@@ -85,6 +95,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 10,
     },
+    characterPlaceholderMobile: {
+        width: '90%', // fluid width based on screen size
+        height: 200, // shorter height for mobile
+        borderWidth: 4, // slightly thinner border for mobile
+    },
     image: {
         width: '100%',
         height: '100%',
@@ -93,7 +108,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         color: '#3B2F2F', // matching dark wood
         fontWeight: '600',
-        fontSize: 16,
+        fontSize: 14, // slightly smaller text on mobile
         letterSpacing: 1, // slightly wider spacing for elegance
     },
 });

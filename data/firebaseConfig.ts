@@ -12,8 +12,6 @@ const firebaseConfig = {
     appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-console.log("Firebase Config:", JSON.stringify(firebaseConfig, null, 2));
-
 import { Platform } from 'react-native';
 
 // ...

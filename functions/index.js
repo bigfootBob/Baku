@@ -2,9 +2,8 @@ const functions = require("firebase-functions");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require('dotenv').config();
 
-// Access API key from Firebase environment configuration OR local .env
-// Run: firebase functions:config:set gemini.key="YOUR_API_KEY"
-const GEN_AI_KEY = functions.config().gemini?.key || process.env.GEMINI_API_KEY;
+// Access API key from standard .env file
+const GEN_AI_KEY = process.env.GEMINI_API_KEY;
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(GEN_AI_KEY || "dummy-key");
@@ -21,12 +20,12 @@ Input:
 
 exports.processWorry = functions.https.onCall(async (data, context) => {
     // Check authentication
-    // if (!context.auth) {
-    //   throw new functions.https.HttpsError(
-    //     "unauthenticated",
-    //     "The function must be called while authenticated."
-    //   );
-    // }
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "unauthenticated",
+            "The function must be called while authenticated."
+        );
+    }
 
     const worryText = data.text;
     if (!worryText || typeof worryText !== 'string' || worryText.length === 0) {

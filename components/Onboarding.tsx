@@ -36,11 +36,19 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-            <View style={styles.content}>
+            <View
+                style={styles.content}
+                accessible={true}
+                accessibilityLabel={`${STEPS[step].title}. ${STEPS[step].description}`}
+            >
                 <Text style={styles.title}>{STEPS[step].title}</Text>
                 <Text style={styles.description}>{STEPS[step].description}</Text>
             </View>
-            <TouchableOpacity style={styles.button} onPress={handleNext}>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={handleNext}
+                accessibilityRole="button"
+            >
                 <Text style={styles.buttonText}>{step === STEPS.length - 1 ? "Begin" : "Next"}</Text>
             </TouchableOpacity>
         </View>

@@ -60,8 +60,12 @@ export default function HomeScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Baku</Text>
-                <View style={styles.stats}>
+                <Text style={styles.headerTitle} accessibilityRole="header">Baku</Text>
+                <View
+                    style={styles.stats}
+                    accessible={true}
+                    accessibilityLabel={`Level ${level}, ${xp % 100} out of 100 XP`}
+                >
                     <Text style={styles.levelText}>Lvl {level}</Text>
                     <Text style={styles.xpText}>{xp % 100} / 100 XP</Text>
                 </View>
@@ -72,7 +76,12 @@ export default function HomeScreen() {
                 {response && (
                     <View style={styles.responseContainer}>
                         <Text style={styles.responseText}>{response}</Text>
-                        <TouchableOpacity onPress={resetLoop} style={styles.resetButton}>
+                        <TouchableOpacity
+                            onPress={resetLoop}
+                            style={styles.resetButton}
+                            accessibilityRole="button"
+                            accessibilityHint="Resets the Baku to sleeping state"
+                        >
                             <Text style={styles.resetButtonText}>Rest</Text>
                         </TouchableOpacity>
                     </View>
@@ -85,6 +94,8 @@ export default function HomeScreen() {
                         style={styles.input}
                         placeholder="What burdens you?"
                         placeholderTextColor="#888"
+                        accessibilityLabel="Worry input field"
+                        accessibilityHint="Type the worry or burden you wish to feed to the Baku"
                         multiline
                         maxLength={280}
                         value={worryText}
@@ -101,6 +112,10 @@ export default function HomeScreen() {
                         style={[styles.feedButton, !worryText.trim() && styles.feedButtonDisabled]}
                         onPress={handleFeed}
                         disabled={!worryText.trim()}
+                        accessibilityRole="button"
+                        accessibilityLabel="Feed"
+                        accessibilityHint="Feeds your input to the Baku"
+                        accessibilityState={{ disabled: !worryText.trim() }}
                     >
                         <Text style={styles.feedButtonText}>Feed</Text>
                     </TouchableOpacity>
