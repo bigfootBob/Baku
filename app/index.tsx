@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, Platform, TouchableWithoutFeedback, ActivityIndicator, Image, Linking } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Pressable, Keyboard, Platform, TouchableWithoutFeedback, ActivityIndicator, Image, Linking } from 'react-native';
 import { Onboarding } from '@/components/Onboarding';
 import { BakuCharacter } from '@/components/BakuCharacter';
+import { PodcastHeader } from '@/components/PodcastHeader';
+import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProgress } from '@/contexts/ProgressContext';
 import { processWorry } from '@/data/api';
@@ -16,6 +18,16 @@ export default function HomeScreen() {
     const [worryText, setWorryText] = useState('');
     const [botField, setBotField] = useState(''); // Honeypot
     const [response, setResponse] = useState<string | null>(null);
+    const [showLevelUp, setShowLevelUp] = useState(false);
+    const [previousLevel, setPreviousLevel] = useState(level);
+
+    // Track level changes
+    React.useEffect(() => {
+        if (level > previousLevel && previousLevel > 0) {
+            setShowLevelUp(true);
+        }
+        setPreviousLevel(level);
+    }, [level]);
 
     const handleFeed = async () => {
         Keyboard.dismiss();
@@ -61,20 +73,7 @@ export default function HomeScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => Linking.openURL('https://www.uncannycoffeepodcast.com/')} activeOpacity={0.8} accessibilityRole="link" accessibilityLabel="Visit Uncanny Coffee Hour Podcast website">
-                    <Image source={require('@/assets/images/UCHlogo.png')} style={styles.logo} resizeMode="contain" />
-                </TouchableOpacity>
-                <Text style={styles.podcastTextSmall}>The Dr Kitsune and Odd Bob</Text>
-                <Text style={styles.podcastTextLarge}>Uncanny Coffee Hour Podcast</Text>
-                <Text style={styles.podcastTextSmall}>presents:</Text>
-
-                <View style={styles.separatorContainer}>
-                    <View style={styles.separatorLine} />
-                    <View style={styles.separatorDiamond} />
-                    <View style={styles.separatorLine} />
-                </View>
-
-                <Text style={styles.headerTitle} accessibilityRole="header">Baku Worry Eater</Text>
+                <PodcastHeader showTitle={true} />
                 <View
                     style={styles.stats}
                     accessible={true}
@@ -90,21 +89,36 @@ export default function HomeScreen() {
                 {response && (
                     <View style={styles.responseContainer}>
                         <Text style={styles.responseText}>{response}</Text>
-                        <TouchableOpacity
+                        <Pressable
                             onPress={resetLoop}
-                            style={styles.resetButton}
+                            style={({ pressed, hovered }: any) => [
+                                styles.resetButton,
+                                hovered && styles.buttonHover,
+                                pressed && styles.buttonPressed,
+                            ]}
                             accessibilityRole="button"
                             accessibilityHint="Resets the Baku to sleeping state"
                         >
                             <Text style={styles.resetButtonText}>Rest</Text>
-                        </TouchableOpacity>
+                        </Pressable>
+                        <Pressable
+                            onPress={() => Linking.openURL('https://www.uncannycoffeepodcast.com/')}
+                            style={({ pressed, hovered }: any) => [
+                                styles.exploreButton,
+                                hovered && styles.buttonHover,
+                                pressed && styles.buttonPressed,
+                            ]}
+                            accessibilityRole="link"
+                            accessibilityHint="Navigates to the Uncanny Coffee Hour Podcast website"
+                        >
+                            <Text style={styles.exploreButtonText}>Explore the Uncanny</Text>
+                        </Pressable>
                     </View>
                 )}
             </View>
 
             {!response && (
                 <View style={styles.inputContainer}>
-                    {/* Honeypot field - visually hidden and pushed offscreen for accessibility */}
                     <TextInput
                         style={styles.honeypot}
                         autoComplete="off"
@@ -132,8 +146,13 @@ export default function HomeScreen() {
                             }
                         }}
                     />
-                    <TouchableOpacity
-                        style={[styles.feedButton, !worryText.trim() && styles.feedButtonDisabled]}
+                    <Pressable
+                        style={({ pressed, hovered }: any) => [
+                            styles.feedButton,
+                            !worryText.trim() && styles.feedButtonDisabled,
+                            worryText.trim() && hovered && styles.buttonHover,
+                            worryText.trim() && pressed && styles.buttonPressed,
+                        ]}
                         onPress={handleFeed}
                         disabled={!worryText.trim()}
                         accessibilityRole="button"
@@ -142,9 +161,15 @@ export default function HomeScreen() {
                         accessibilityState={{ disabled: !worryText.trim() }}
                     >
                         <Text style={styles.feedButtonText}>Feed</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
             )}
+
+            <LevelUpCelebration
+                visible={showLevelUp}
+                level={level}
+                onClose={() => setShowLevelUp(false)}
+            />
         </SafeAreaView>
     );
 }
@@ -164,56 +189,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 10,
         alignItems: 'center',
-    },
-    logo: {
-        width: 100,
-        height: 100,
-        marginBottom: 8,
-    },
-    podcastTextSmall: {
-        fontSize: 16,
-        color: '#5B6F5F',
-        fontStyle: 'italic',
-        marginBottom: 2,
-        textAlign: 'center',
-        paddingHorizontal: 20,
-    },
-    podcastTextLarge: {
-        fontSize: 22,
-        color: '#3B2F2F',
-        fontWeight: 'bold',
-        fontStyle: 'italic',
-        marginBottom: 4,
-        textAlign: 'center',
-        paddingHorizontal: 20,
-    },
-    separatorContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '60%',
-        marginVertical: 12,
-    },
-    separatorLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: '#8A3324', // Vermilion red
-        opacity: 0.5,
-    },
-    separatorDiamond: {
-        width: 6,
-        height: 6,
-        backgroundColor: '#8A3324',
-        transform: [{ rotate: '45deg' }],
-        marginHorizontal: 8,
-        opacity: 0.8,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#3B2F2F', // Dark Lacquer wood
-        letterSpacing: 2,
-        marginTop: 4,
     },
     stats: {
         flexDirection: 'row',
@@ -250,9 +225,19 @@ const styles = StyleSheet.create({
     },
     resetButton: {
         marginTop: 20,
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#8A3324',
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+        backgroundColor: '#F3EFE0',
+        borderRadius: 6,
+        borderWidth: 2,
+        borderColor: '#8A3324',
+        shadowColor: '#8A3324',
+        shadowOffset: { width: 4, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+        elevation: 0,
+        // @ts-ignore
+        transitionDuration: '150ms',
     },
     resetButtonText: {
         color: '#8A3324', // Vermilion red
@@ -260,9 +245,35 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         letterSpacing: 1,
     },
+    exploreButton: {
+        marginTop: 16,
+        marginBottom: 20, // Added space below
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        backgroundColor: '#3B2F2F', // Dark lacquer
+        borderRadius: 6,
+        borderWidth: 2,
+        borderColor: '#211818',
+        shadowColor: '#211818',
+        shadowOffset: { width: 4, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+        elevation: 0,
+        // @ts-ignore
+        transitionDuration: '150ms',
+    },
+    exploreButtonText: {
+        color: '#F3EFE0', // Light Washi
+        fontSize: 18,
+        fontWeight: 'bold',
+        letterSpacing: 1,
+    },
     inputContainer: {
         padding: 20,
         backgroundColor: '#F3EFE0', // Match background
+        width: '100%',
+        maxWidth: 680, // User requested 680 instead of 450
+        alignSelf: 'center', // Center the block on larger screens
     },
     input: {
         backgroundColor: '#EBE5D0', // Slightly darker washi paper for depth
@@ -288,19 +299,31 @@ const styles = StyleSheet.create({
         marginTop: 16,
         backgroundColor: '#3B2F2F', // Dark Lacquer
         paddingVertical: 16,
-        borderRadius: 4, // Square edges
+        borderRadius: 6, // Square edges
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: '#211818',
+        shadowColor: '#211818',
+        shadowOffset: { width: 4, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+        elevation: 0,
+        // @ts-ignore
+        transitionDuration: '150ms',
+    },
+    buttonHover: {
+        shadowOffset: { width: 6, height: 6 },
+        transform: [{ translateX: -2 }, { translateY: -2 }],
+    },
+    buttonPressed: {
+        shadowOffset: { width: 0, height: 0 },
+        transform: [{ translateX: 4 }, { translateY: 4 }],
     },
     feedButtonDisabled: {
         backgroundColor: '#A39C8E', // Faded ink color
         borderColor: '#A39C8E',
         shadowOpacity: 0,
+        transform: [{ translateX: 4 }, { translateY: 4 }],
     },
     feedButtonText: {
         color: '#F3EFE0', // Light Washi text

@@ -11,9 +11,9 @@ interface BakuCharacterProps {
 
 // Pre-load or reference the local assets
 const images = {
-    sleep: require('@/assets/images/baku-sleep.jpg'),
-    eat: require('@/assets/images/baku-eat.jpg'),
-    wise: require('@/assets/images/baku-wise.jpg'),
+    sleep: [require('@/assets/images/baku-sleep.webp'), require('@/assets/images/baku-sleep.jpg')],
+    eat: [require('@/assets/images/baku-eat.webp'), require('@/assets/images/baku-eat.jpg')],
+    wise: [require('@/assets/images/baku-wise.webp'), require('@/assets/images/baku-wise.jpg')],
 };
 
 export function BakuCharacter({ state }: BakuCharacterProps) {
@@ -62,6 +62,7 @@ export function BakuCharacter({ state }: BakuCharacterProps) {
                     source={currentImage}
                     style={styles.image}
                     contentFit="cover"
+                    accessibilityLabel={`Illustration of the Baku. The Baku is ${state === 'IDLE' ? 'wise' : state.toLowerCase()}.`}
                 />
             </Animated.View>
             <Text style={styles.label}>

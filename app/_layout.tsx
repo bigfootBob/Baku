@@ -9,9 +9,16 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ProgressProvider } from '@/contexts/ProgressContext';
 import { Platform } from 'react-native';
+import { useEffect } from 'react';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      document.title = "Baku Worry Eater";
+    }
+  }, []);
 
   return (
     <>
