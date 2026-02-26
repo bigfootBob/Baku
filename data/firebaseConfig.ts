@@ -3,7 +3,6 @@ import { initializeAuth, getReactNativePersistence, Auth, getAuth } from 'fireba
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -15,9 +14,6 @@ const firebaseConfig = {
 
 import { Platform } from 'react-native';
 
-// ...
-
-// Initialize Firebase
 let app: FirebaseApp;
 let auth: Auth;
 

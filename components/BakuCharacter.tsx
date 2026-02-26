@@ -19,7 +19,7 @@ const images = {
 export function BakuCharacter({ state }: BakuCharacterProps) {
     const opacity = useSharedValue(1);
     const { width } = useWindowDimensions();
-    const isMobile = width < 425;
+    const isMobile = width < 768; // Cover all modern smartphones including Pro Max models
 
     const getTargetImage = (currentState: BakuState) => {
         if (currentState === 'SLEEPING' || currentState === 'WAKING') return images.sleep;
@@ -73,12 +73,14 @@ export function BakuCharacter({ state }: BakuCharacterProps) {
 
 const styles = StyleSheet.create({
     container: {
+        width: '100%', // Required for percentage-based child widths to resolve correctly
         alignItems: 'center',
         justifyContent: 'center',
         height: 350, // slightly taller to accommodate larger square
     },
     containerMobile: {
-        height: 250, // shorter on mobile
+        height: 220, // strictly override the 350px height
+        paddingVertical: 10,
     },
     characterPlaceholder: {
         width: 450,
@@ -96,16 +98,16 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
     },
     characterPlaceholderMobile: {
-        width: '90%', // fluid width based on screen size
-        height: 200, // shorter height for mobile
-        borderWidth: 4, // slightly thinner border for mobile
+        width: 280, // strictly bound width
+        height: 160, // strictly bound height
+        borderWidth: 3, // thinner border for mobile
     },
     image: {
         width: '100%',
         height: '100%',
     },
     label: {
-        marginTop: 20,
+        marginTop: 15,
         color: '#3B2F2F', // matching dark wood
         fontWeight: '600',
         fontSize: 14, // slightly smaller text on mobile

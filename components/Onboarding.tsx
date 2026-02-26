@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderRadius: 30,
         alignItems: 'center',
+        marginBottom: 60, // push the button further up the screen
     },
     buttonText: {
         color: '#FDFCF0',
