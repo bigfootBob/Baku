@@ -14,6 +14,7 @@ export default function HomeScreen() {
     const { xp, level, addXp } = useProgress();
     const [bakuState, setBakuState] = useState<BakuState>('SLEEPING');
     const [worryText, setWorryText] = useState('');
+    const [botField, setBotField] = useState(''); // Honeypot
     const [response, setResponse] = useState<string | null>(null);
 
     const handleFeed = async () => {
@@ -27,7 +28,7 @@ export default function HomeScreen() {
             await new Promise(resolve => setTimeout(resolve, 1500));
             setBakuState('PROCESSING');
 
-            const apiResponse = await processWorry(worryText);
+            const apiResponse = await processWorry(worryText, botField);
 
             await addXp(20); // Award XP
             setResponse(apiResponse);
@@ -103,6 +104,16 @@ export default function HomeScreen() {
 
             {!response && (
                 <View style={styles.inputContainer}>
+                    {/* Honeypot field - visually hidden and pushed offscreen for accessibility */}
+                    <TextInput
+                        style={styles.honeypot}
+                        autoComplete="off"
+                        value={botField}
+                        onChangeText={setBotField}
+                        tabIndex={-1}
+                        accessibilityElementsHidden={true}
+                        importantForAccessibility="no"
+                    />
                     <TextInput
                         style={styles.input}
                         placeholder="What burdens you?"
@@ -264,6 +275,14 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#C3BCA5', // Subtle border
         shadowOpacity: 0,
+    },
+    honeypot: {
+        position: 'absolute',
+        top: -9999,
+        left: -9999,
+        opacity: 0,
+        height: 0,
+        width: 0,
     },
     feedButton: {
         marginTop: 16,

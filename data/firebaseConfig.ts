@@ -1,5 +1,6 @@
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { initializeAuth, getReactNativePersistence, Auth, getAuth } from 'firebase/auth';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 // Your web app's Firebase configuration
@@ -28,6 +29,14 @@ if (getApps().length === 0) {
     } else {
         auth = initializeAuth(app, {
             persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+        });
+    }
+
+    // Initialize App Check for Web (Browser environment only, to prevent SSR errors)
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && process.env.EXPO_PUBLIC_RECAPTCHA_SITE_KEY) {
+        initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider(process.env.EXPO_PUBLIC_RECAPTCHA_SITE_KEY),
+            isTokenAutoRefreshEnabled: true
         });
     }
 } else {

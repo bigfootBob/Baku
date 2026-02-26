@@ -8,11 +8,11 @@ if (process.env.NODE_ENV === 'development') {
     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 }
 
-export const processWorry = async (text: string): Promise<string> => {
+export const processWorry = async (text: string, botField: string = ''): Promise<string> => {
     try {
-        const processWorryFn = httpsCallable<{ text: string }, { response: string }>(functions, 'processWorry');
+        const processWorryFn = httpsCallable<{ text: string; botField: string }, { response: string }>(functions, 'processWorry');
 
-        const result = await processWorryFn({ text });
+        const result = await processWorryFn({ text, botField });
         return result.data.response;
 
     } catch (error: any) {

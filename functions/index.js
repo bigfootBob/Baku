@@ -27,7 +27,24 @@ exports.processWorry = functions.runWith({ maxInstances: 3 }).https.onCall(async
         );
     }
 
+    // Verify Firebase App Check token
+    if (context.app === undefined) {
+        throw new functions.https.HttpsError(
+            'failed-precondition',
+            'The function must be called from an App Check verified app.'
+        );
+    }
+
     const worryText = data.text;
+    const botField = data.botField;
+
+    // Honeypot check: if a bot filled out the hidden field, silently succeed 
+    // with a generic message so they don't realize they've been caught
+    if (botField && botField.length > 0) {
+        console.log(`[HONEYPOT TRIGGERED] Bot rejected. Auth: ${context.auth.uid}`);
+        return { response: "The Baku eats your worry in silence." };
+    }
+
     if (!worryText || typeof worryText !== 'string' || worryText.length === 0) {
         throw new functions.https.HttpsError(
             "invalid-argument",
