@@ -3,8 +3,8 @@ import { app } from './firebaseConfig';
 
 const functions = getFunctions(app);
 
-// Use the emulator if in development
-if (process.env.NODE_ENV === 'development' || __DEV__) {
+// Defaulting strictly to use the local emulator to test the web build locally.
+if (process.env.NODE_ENV === 'development') {
     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 }
 

@@ -7,7 +7,7 @@ const GEN_AI_KEY = process.env.GEMINI_API_KEY;
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(GEN_AI_KEY || "dummy-key");
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 const SYSTEM_PROMPT = `
 You act as a Baku, a mythological spirit that eats nightmares. 
@@ -18,7 +18,7 @@ If the input indicates self-harm or severe crisis, respond ONLY with: "Your burd
 Input: 
 `;
 
-exports.processWorry = functions.https.onCall(async (data, context) => {
+exports.processWorry = functions.runWith({ maxInstances: 3 }).https.onCall(async (data, context) => {
     // Check authentication
     if (!context.auth) {
         throw new functions.https.HttpsError(
