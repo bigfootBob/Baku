@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS, withRepeat, withSequence, interpolateColor } from 'react-native-reanimated';
 
 type BakuState = 'SLEEPING' | 'WAKING' | 'EATING' | 'PROCESSING' | 'IDLE';
 
@@ -30,6 +30,24 @@ export function BakuCharacter({ state }: BakuCharacterProps) {
     const targetImage = getTargetImage(state);
     const [currentImage, setCurrentImage] = useState(targetImage);
 
+    // For pulsing border
+    const pulse = useSharedValue(0);
+
+    useEffect(() => {
+        if (state === 'PROCESSING') {
+            pulse.value = withRepeat(
+                withSequence(
+                    withTiming(1, { duration: 800 }),
+                    withTiming(0, { duration: 800 })
+                ),
+                -1, // infinite
+                true // reverse
+            );
+        } else {
+            pulse.value = withTiming(0, { duration: 400 });
+        }
+    }, [state, pulse]);
+
     useEffect(() => {
         if (targetImage !== currentImage) {
             // Fade out
@@ -45,8 +63,14 @@ export function BakuCharacter({ state }: BakuCharacterProps) {
     }, [state, targetImage, currentImage, opacity]);
 
     const animatedStyle = useAnimatedStyle(() => {
+        const borderColor = interpolateColor(
+            pulse.value,
+            [0, 1],
+            ['#3B2F2F', '#E6A57E'] // Dark wood to Sunset Orange pulse
+        );
         return {
             opacity: opacity.value,
+            borderColor,
         };
     });
 

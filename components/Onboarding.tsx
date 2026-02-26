@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, useWindowDimensions, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { PodcastHeader } from '@/components/PodcastHeader';
@@ -42,35 +42,37 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-            <PodcastHeader showTitle={true} />
-            <View
-                style={styles.content}
-                accessible={true}
-                accessibilityLabel={`${STEPS[step].title}. ${STEPS[step].description}`}
-            >
-                <View style={[styles.imageContainer, isMobile && styles.imageContainerMobile]}>
-                    <Image
-                        source={STEPS[step].image}
-                        style={styles.image}
-                        contentFit="cover"
-                        transition={400}
-                        accessibilityLabel={`Illustration of Baku for: ${STEPS[step].title}`}
-                    />
+            <ScrollView contentContainerStyle={styles.scrollContent} bounces={false}>
+                <PodcastHeader showTitle={true} />
+                <View
+                    style={styles.content}
+                    accessible={true}
+                    accessibilityLabel={`${STEPS[step].title}. ${STEPS[step].description}`}
+                >
+                    <View style={[styles.imageContainer, isMobile && styles.imageContainerMobile]}>
+                        <Image
+                            source={STEPS[step].image}
+                            style={styles.image}
+                            contentFit="cover"
+                            transition={400}
+                            accessibilityLabel={`Illustration of Baku for: ${STEPS[step].title}`}
+                        />
+                    </View>
+                    <Text style={styles.title}>{STEPS[step].title}</Text>
+                    <Text style={styles.description}>{STEPS[step].description}</Text>
                 </View>
-                <Text style={styles.title}>{STEPS[step].title}</Text>
-                <Text style={styles.description}>{STEPS[step].description}</Text>
-            </View>
-            <Pressable
-                style={({ pressed, hovered }: any) => [
-                    styles.button,
-                    hovered && styles.buttonHover,
-                    pressed && styles.buttonPressed,
-                ]}
-                onPress={handleNext}
-                accessibilityRole="button"
-            >
-                <Text style={styles.buttonText}>{step === STEPS.length - 1 ? "Begin" : "Next"}</Text>
-            </Pressable>
+                <Pressable
+                    style={({ pressed, hovered }: any) => [
+                        styles.button,
+                        hovered && styles.buttonHover,
+                        pressed && styles.buttonPressed,
+                    ]}
+                    onPress={handleNext}
+                    accessibilityRole="button"
+                >
+                    <Text style={styles.buttonText}>{step === STEPS.length - 1 ? "Begin" : "Next"}</Text>
+                </Pressable>
+            </ScrollView>
         </View>
     );
 }
@@ -79,8 +81,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#FDFCF0', // paper
+    },
+    scrollContent: {
+        flexGrow: 1,
         justifyContent: 'space-between',
         padding: 24,
+        paddingBottom: 60, // Extra padding for mobile browser nav bars
     },
     content: {
         flex: 1,

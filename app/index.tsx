@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Pressable, Keyboard, Platform, TouchableWithoutFeedback, ActivityIndicator, Image, Linking } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Pressable, Keyboard, Platform, TouchableWithoutFeedback, ActivityIndicator, Image, Linking, ScrollView } from 'react-native';
 import { Onboarding } from '@/components/Onboarding';
 import { BakuCharacter } from '@/components/BakuCharacter';
 import { PodcastHeader } from '@/components/PodcastHeader';
@@ -72,98 +72,100 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <PodcastHeader showTitle={true} />
-                <View
-                    style={styles.stats}
-                    accessible={true}
-                    accessibilityLabel={`Level ${level}, ${xp % 100} out of 100 XP`}
-                >
-                    <Text style={styles.levelText}>Lvl {level}</Text>
-                    <Text style={styles.xpText}>{xp % 100} / 100 XP</Text>
+            <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
+                <View style={styles.header}>
+                    <PodcastHeader showTitle={true} />
+                    <View
+                        style={styles.stats}
+                        accessible={true}
+                        accessibilityLabel={`Level ${level}, ${xp % 100} out of 100 XP`}
+                    >
+                        <Text style={styles.levelText}>Lvl {level}</Text>
+                        <Text style={styles.xpText}>{xp % 100} / 100 XP</Text>
+                    </View>
                 </View>
-            </View>
 
-            <View style={styles.stage}>
-                <BakuCharacter state={bakuState} />
-                {response && (
-                    <View style={styles.responseContainer}>
-                        <Text style={styles.responseText}>{response}</Text>
+                <View style={styles.stage}>
+                    <BakuCharacter state={bakuState} />
+                    {response && (
+                        <View style={styles.responseContainer}>
+                            <Text style={styles.responseText}>{response}</Text>
+                            <Pressable
+                                onPress={resetLoop}
+                                style={({ pressed, hovered }: any) => [
+                                    styles.resetButton,
+                                    hovered && styles.buttonHover,
+                                    pressed && styles.buttonPressed,
+                                ]}
+                                accessibilityRole="button"
+                                accessibilityHint="Resets the Baku to sleeping state"
+                            >
+                                <Text style={styles.resetButtonText}>Rest</Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={() => Linking.openURL('https://www.uncannycoffeepodcast.com/')}
+                                style={({ pressed, hovered }: any) => [
+                                    styles.exploreButton,
+                                    hovered && styles.buttonHover,
+                                    pressed && styles.buttonPressed,
+                                ]}
+                                accessibilityRole="link"
+                                accessibilityHint="Navigates to the Uncanny Coffee Hour Podcast website"
+                            >
+                                <Text style={styles.exploreButtonText}>Explore the Uncanny</Text>
+                            </Pressable>
+                        </View>
+                    )}
+                </View>
+
+                {!response && (
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.honeypot}
+                            autoComplete="off"
+                            value={botField}
+                            onChangeText={setBotField}
+                            tabIndex={-1}
+                            accessibilityElementsHidden={true}
+                            importantForAccessibility="no"
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="What burdens you?"
+                            placeholderTextColor="#888"
+                            accessibilityLabel="Worry input field"
+                            accessibilityHint="Type the worry or burden you wish to feed to the Baku"
+                            multiline
+                            maxLength={280}
+                            value={worryText}
+                            onChangeText={(text) => {
+                                setWorryText(text);
+                                if (bakuState === 'SLEEPING' && text.length > 0) {
+                                    setBakuState('WAKING');
+                                } else if (bakuState === 'WAKING' && text.length === 0) {
+                                    setBakuState('SLEEPING');
+                                }
+                            }}
+                        />
                         <Pressable
-                            onPress={resetLoop}
                             style={({ pressed, hovered }: any) => [
-                                styles.resetButton,
-                                hovered && styles.buttonHover,
-                                pressed && styles.buttonPressed,
+                                styles.feedButton,
+                                (!worryText.trim() || bakuState === 'EATING' || bakuState === 'PROCESSING') && styles.feedButtonDisabled,
+                                worryText.trim() && bakuState !== 'EATING' && bakuState !== 'PROCESSING' && hovered && styles.buttonHover,
+                                worryText.trim() && bakuState !== 'EATING' && bakuState !== 'PROCESSING' && pressed && styles.buttonPressed,
                             ]}
+                            onPress={handleFeed}
+                            disabled={!worryText.trim() || bakuState === 'EATING' || bakuState === 'PROCESSING'}
                             accessibilityRole="button"
-                            accessibilityHint="Resets the Baku to sleeping state"
+                            accessibilityLabel="Feed"
+                            accessibilityHint="Feeds your input to the Baku"
+                            accessibilityState={{ disabled: !worryText.trim() || bakuState === 'EATING' || bakuState === 'PROCESSING' }}
                         >
-                            <Text style={styles.resetButtonText}>Rest</Text>
-                        </Pressable>
-                        <Pressable
-                            onPress={() => Linking.openURL('https://www.uncannycoffeepodcast.com/')}
-                            style={({ pressed, hovered }: any) => [
-                                styles.exploreButton,
-                                hovered && styles.buttonHover,
-                                pressed && styles.buttonPressed,
-                            ]}
-                            accessibilityRole="link"
-                            accessibilityHint="Navigates to the Uncanny Coffee Hour Podcast website"
-                        >
-                            <Text style={styles.exploreButtonText}>Explore the Uncanny</Text>
+                            <Text style={styles.feedButtonText}>{bakuState === 'EATING' || bakuState === 'PROCESSING' ? "Devouring..." : "Feed"}</Text>
                         </Pressable>
                     </View>
                 )}
-            </View>
-
-            {!response && (
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.honeypot}
-                        autoComplete="off"
-                        value={botField}
-                        onChangeText={setBotField}
-                        tabIndex={-1}
-                        accessibilityElementsHidden={true}
-                        importantForAccessibility="no"
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="What burdens you?"
-                        placeholderTextColor="#888"
-                        accessibilityLabel="Worry input field"
-                        accessibilityHint="Type the worry or burden you wish to feed to the Baku"
-                        multiline
-                        maxLength={280}
-                        value={worryText}
-                        onChangeText={(text) => {
-                            setWorryText(text);
-                            if (bakuState === 'SLEEPING' && text.length > 0) {
-                                setBakuState('WAKING');
-                            } else if (bakuState === 'WAKING' && text.length === 0) {
-                                setBakuState('SLEEPING');
-                            }
-                        }}
-                    />
-                    <Pressable
-                        style={({ pressed, hovered }: any) => [
-                            styles.feedButton,
-                            !worryText.trim() && styles.feedButtonDisabled,
-                            worryText.trim() && hovered && styles.buttonHover,
-                            worryText.trim() && pressed && styles.buttonPressed,
-                        ]}
-                        onPress={handleFeed}
-                        disabled={!worryText.trim()}
-                        accessibilityRole="button"
-                        accessibilityLabel="Feed"
-                        accessibilityHint="Feeds your input to the Baku"
-                        accessibilityState={{ disabled: !worryText.trim() }}
-                    >
-                        <Text style={styles.feedButtonText}>Feed</Text>
-                    </Pressable>
-                </View>
-            )}
+            </ScrollView>
 
             <LevelUpCelebration
                 visible={showLevelUp}
