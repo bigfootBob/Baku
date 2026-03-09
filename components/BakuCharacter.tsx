@@ -11,9 +11,9 @@ interface BakuCharacterProps {
 
 // Pre-load or reference the local assets
 const images = {
-    sleep: [require('@/assets/images/baku-sleep.webp'), require('@/assets/images/baku-sleep.jpg')],
-    eat: [require('@/assets/images/baku-eat.webp'), require('@/assets/images/baku-eat.jpg')],
-    wise: [require('@/assets/images/baku-wise.webp'), require('@/assets/images/baku-wise.jpg')],
+    sleep: require('@/assets/images/baku-sleep.webp'),
+    eat: require('@/assets/images/baku-eat.webp'),
+    wise: require('@/assets/images/baku-wise.webp'),
 };
 
 export function BakuCharacter({ state }: BakuCharacterProps) {

@@ -1,6 +1,7 @@
+import "react-native-gesture-handler";
 import "../global.css";
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Stack, ErrorBoundary } from 'expo-router';
 import Head from 'expo-router/head';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
@@ -8,7 +9,10 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ProgressProvider } from '@/contexts/ProgressContext';
-import { Platform } from 'react-native';
+import { Platform, LogBox } from 'react-native';
+import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+
+LogBox.ignoreLogs(['SafeAreaView has been deprecated']);
 import { useEffect } from 'react';
 
 export default function RootLayout() {
@@ -32,6 +36,7 @@ export default function RootLayout() {
           <link rel="manifest" href="/site.webmanifest" />
         </Head>
       )}
+      <GoogleAnalytics />
       <AuthProvider>
         <ProgressProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

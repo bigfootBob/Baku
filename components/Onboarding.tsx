@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, useWindowDimensions, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, useWindowDimensions, ScrollView, Platform, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { PodcastHeader } from '@/components/PodcastHeader';
@@ -12,17 +12,17 @@ const STEPS = [
     {
         title: "The Baku",
         description: "I am the eater of nightmares. I hunger for your worries.",
-        image: [require('@/assets/images/baku-start.webp'), require('@/assets/images/baku-start.jpg')],
+        image: require('@/assets/images/baku-start.webp'),
     },
     {
         title: "Feed Me",
         description: "Write down what burdens you. A sentence is enough.",
-        image: [require('@/assets/images/baku-hungry.webp'), require('@/assets/images/baku-hungry.jpg')],
+        image: require('@/assets/images/baku-hungry.webp'),
     },
     {
         title: "Let Go",
         description: "I will devour your worry. It will be gone forever. Safe.",
-        image: [require('@/assets/images/baku-ready.webp'), require('@/assets/images/baku-ready.jpg')],
+        image: require('@/assets/images/baku-ready.webp'),
     },
 ];
 
@@ -42,7 +42,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-            <ScrollView contentContainerStyle={styles.scrollContent} bounces={false}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} bounces={false}>
                 <PodcastHeader showTitle={true} />
                 <View
                     style={styles.content}
@@ -61,17 +61,14 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                     <Text style={styles.title}>{STEPS[step].title}</Text>
                     <Text style={styles.description}>{STEPS[step].description}</Text>
                 </View>
-                <Pressable
-                    style={({ pressed, hovered }: any) => [
-                        styles.button,
-                        hovered && styles.buttonHover,
-                        pressed && styles.buttonPressed,
-                    ]}
+                <TouchableOpacity
+                    style={styles.button}
                     onPress={handleNext}
+                    activeOpacity={0.7}
                     accessibilityRole="button"
                 >
                     <Text style={styles.buttonText}>{step === STEPS.length - 1 ? "Begin" : "Next"}</Text>
-                </Pressable>
+                </TouchableOpacity>
             </ScrollView>
         </View>
     );
@@ -140,20 +137,14 @@ const styles = StyleSheet.create({
         marginBottom: 60, // push the button further up the screen
         width: 220, // Make button smaller
         alignSelf: 'center',
-        shadowColor: '#2D2D2D',
-        shadowOffset: { width: 4, height: 4 },
-        shadowOpacity: 1,
-        shadowRadius: 0,
-        elevation: 0,
-        // @ts-ignore - Web only
-        transitionDuration: '150ms',
+        elevation: 4, // Android shadow
     },
     buttonHover: {
-        shadowOffset: { width: 6, height: 6 },
+        elevation: 6,
         transform: [{ translateX: -2 }, { translateY: -2 }],
     },
     buttonPressed: {
-        shadowOffset: { width: 0, height: 0 },
+        elevation: 0,
         transform: [{ translateX: 4 }, { translateY: 4 }],
     },
     buttonText: {

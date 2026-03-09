@@ -1,6 +1,5 @@
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { initializeAuth, getReactNativePersistence, Auth, getAuth } from 'firebase/auth';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
@@ -30,6 +29,7 @@ if (getApps().length === 0) {
 
     // Initialize App Check for Web (Browser environment only, to prevent SSR errors)
     if (Platform.OS === 'web' && typeof window !== 'undefined' && process.env.EXPO_PUBLIC_RECAPTCHA_SITE_KEY) {
+        const { initializeAppCheck, ReCaptchaV3Provider } = require('firebase/app-check');
         initializeAppCheck(app, {
             provider: new ReCaptchaV3Provider(process.env.EXPO_PUBLIC_RECAPTCHA_SITE_KEY),
             isTokenAutoRefreshEnabled: true

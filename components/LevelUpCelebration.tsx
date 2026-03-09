@@ -10,7 +10,7 @@ interface LevelUpCelebrationProps {
     onClose: () => void;
 }
 
-const lvlupImages = [require('@/assets/images/baku-lvlup.webp'), require('@/assets/images/baku-lvlup.jpg')];
+const lvlupImages = require('@/assets/images/baku-lvlup.webp');
 
 export function LevelUpCelebration({ visible, level, onClose }: LevelUpCelebrationProps) {
     const { width } = useWindowDimensions();
@@ -167,8 +167,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 4, height: 4 },
         shadowOpacity: 1,
         shadowRadius: 0,
-        // @ts-ignore
-        transitionDuration: '150ms',
     },
     buttonHover: {
         shadowOffset: { width: 6, height: 6 },

@@ -72,7 +72,7 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, paddingBottom: Platform.OS === 'web' ? 60 : 120 }} keyboardShouldPersistTaps="handled">
                 <View style={styles.header}>
                     <PodcastHeader showTitle={true} />
                     <View
@@ -90,45 +90,41 @@ export default function HomeScreen() {
                     {response && (
                         <View style={styles.responseContainer}>
                             <Text style={styles.responseText}>{response}</Text>
-                            <Pressable
+                            <TouchableOpacity
                                 onPress={resetLoop}
-                                style={({ pressed, hovered }: any) => [
-                                    styles.resetButton,
-                                    hovered && styles.buttonHover,
-                                    pressed && styles.buttonPressed,
-                                ]}
+                                style={styles.resetButton}
+                                activeOpacity={0.7}
                                 accessibilityRole="button"
                                 accessibilityHint="Resets the Baku to sleeping state"
                             >
                                 <Text style={styles.resetButtonText}>Rest</Text>
-                            </Pressable>
-                            <Pressable
+                            </TouchableOpacity>
+                            <TouchableOpacity
                                 onPress={() => Linking.openURL('https://www.uncannycoffeepodcast.com/')}
-                                style={({ pressed, hovered }: any) => [
-                                    styles.exploreButton,
-                                    hovered && styles.buttonHover,
-                                    pressed && styles.buttonPressed,
-                                ]}
+                                style={styles.exploreButton}
+                                activeOpacity={0.7}
                                 accessibilityRole="link"
                                 accessibilityHint="Navigates to the Uncanny Coffee Hour Podcast website"
                             >
                                 <Text style={styles.exploreButtonText}>Explore the Uncanny</Text>
-                            </Pressable>
+                            </TouchableOpacity>
                         </View>
                     )}
                 </View>
 
                 {!response && (
                     <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.honeypot}
-                            autoComplete="off"
-                            value={botField}
-                            onChangeText={setBotField}
-                            tabIndex={-1}
-                            accessibilityElementsHidden={true}
-                            importantForAccessibility="no"
-                        />
+                        {Platform.OS === 'web' && (
+                            <TextInput
+                                style={styles.honeypot}
+                                autoComplete="off"
+                                value={botField}
+                                onChangeText={setBotField}
+                                tabIndex={-1}
+                                accessibilityElementsHidden={true}
+                                importantForAccessibility="no"
+                            />
+                        )}
                         <TextInput
                             style={styles.input}
                             placeholder="What burdens you?"
@@ -147,22 +143,21 @@ export default function HomeScreen() {
                                 }
                             }}
                         />
-                        <Pressable
-                            style={({ pressed, hovered }: any) => [
+                        <TouchableOpacity
+                            style={[
                                 styles.feedButton,
                                 (!worryText.trim() || bakuState === 'EATING' || bakuState === 'PROCESSING') && styles.feedButtonDisabled,
-                                worryText.trim() && bakuState !== 'EATING' && bakuState !== 'PROCESSING' && hovered && styles.buttonHover,
-                                worryText.trim() && bakuState !== 'EATING' && bakuState !== 'PROCESSING' && pressed && styles.buttonPressed,
                             ]}
                             onPress={handleFeed}
                             disabled={!worryText.trim() || bakuState === 'EATING' || bakuState === 'PROCESSING'}
+                            activeOpacity={0.7}
                             accessibilityRole="button"
                             accessibilityLabel="Feed"
                             accessibilityHint="Feeds your input to the Baku"
                             accessibilityState={{ disabled: !worryText.trim() || bakuState === 'EATING' || bakuState === 'PROCESSING' }}
                         >
                             <Text style={styles.feedButtonText}>{bakuState === 'EATING' || bakuState === 'PROCESSING' ? "Devouring..." : "Feed"}</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                     </View>
                 )}
             </ScrollView>
@@ -233,13 +228,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         borderWidth: 2,
         borderColor: '#8A3324',
-        shadowColor: '#8A3324',
-        shadowOffset: { width: 4, height: 4 },
-        shadowOpacity: 1,
-        shadowRadius: 0,
-        elevation: 0,
-        // @ts-ignore
-        transitionDuration: '150ms',
+        elevation: 4,
     },
     resetButtonText: {
         color: '#8A3324', // Vermilion red
@@ -256,13 +245,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         borderWidth: 2,
         borderColor: '#211818',
-        shadowColor: '#211818',
-        shadowOffset: { width: 4, height: 4 },
-        shadowOpacity: 1,
-        shadowRadius: 0,
-        elevation: 0,
-        // @ts-ignore
-        transitionDuration: '150ms',
+        elevation: 4,
     },
     exploreButtonText: {
         color: '#F3EFE0', // Light Washi
@@ -275,7 +258,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F3EFE0', // Match background
         width: '100%',
         maxWidth: 680, // User requested 680 instead of 450
-        alignSelf: 'center', // Center the block on larger screens
+        marginHorizontal: 'auto', // Better centering approach across platforms
     },
     input: {
         backgroundColor: '#EBE5D0', // Slightly darker washi paper for depth
@@ -305,26 +288,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 2,
         borderColor: '#211818',
-        shadowColor: '#211818',
-        shadowOffset: { width: 4, height: 4 },
-        shadowOpacity: 1,
-        shadowRadius: 0,
-        elevation: 0,
-        // @ts-ignore
-        transitionDuration: '150ms',
+        elevation: 4,
     },
     buttonHover: {
-        shadowOffset: { width: 6, height: 6 },
+        elevation: 6,
         transform: [{ translateX: -2 }, { translateY: -2 }],
     },
     buttonPressed: {
-        shadowOffset: { width: 0, height: 0 },
+        elevation: 0,
         transform: [{ translateX: 4 }, { translateY: 4 }],
     },
     feedButtonDisabled: {
         backgroundColor: '#A39C8E', // Faded ink color
         borderColor: '#A39C8E',
-        shadowOpacity: 0,
+        elevation: 0,
         transform: [{ translateX: 4 }, { translateY: 4 }],
     },
     feedButtonText: {
