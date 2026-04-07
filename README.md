@@ -12,11 +12,11 @@ This project is a companion app for the [Uncanny Coffee Hour Podcast](https://ww
 
 ## Screenshots
 
-| Onboarding | Feed the Baku | Baku Responds | Level Up |
+| Welcome | Intro to Baku | What to Expect | Feeding Baku |
 |:-:|:-:|:-:|:-:|
-| ![Onboarding step 1](https://github.com/user-attachments/assets/ccf95afd-9a47-4cab-b6a8-acf89823681d) | ![Feed the Baku](https://github.com/user-attachments/assets/5d2a2b29-e135-4fed-beb6-81a2becd6f5e) | ![Baku response](https://github.com/user-attachments/assets/2db60e24-4a79-4dba-a57c-cdf612225e9a) | ![Level up celebration](https://github.com/user-attachments/assets/78fec2fe-2998-42b6-b1f9-3317b5698a72) |
+| ![Welcome](https://github.com/user-attachments/assets/78fec2fe-2998-42b6-b1f9-3317b5698a72) | ![Intro to Baku](https://github.com/user-attachments/assets/5d2a2b29-e135-4fed-beb6-81a2becd6f5e) | ![What to Expect](https://github.com/user-attachments/assets/2db60e24-4a79-4dba-a57c-cdf612225e9a) | ![Feeding](https://github.com/user-attachments/assets/546bceca-af64-4362-8625-1ac0a74dfa10) |
 
-![App overview](https://github.com/user-attachments/assets/546bceca-af64-4362-8625-1ac0a74dfa10)
+![App overview](https://github.com/user-attachments/assets/ccf95afd-9a47-4cab-b6a8-acf89823681d)
 
 ---
 
