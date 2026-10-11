@@ -31,6 +31,26 @@ const CRISIS_PATTERNS = [
 ];
 const isCrisis = (text) => CRISIS_PATTERNS.some((re) => re.test(text));
 
+// Best-effort per-user rate limit (per function instance, max 3 instances).
+// Caps how fast one anonymous user can spend Gemini quota. Pair this with a
+// quota on the Gemini API key in Google Cloud for a hard ceiling.
+const RATE_LIMIT = 8;                 // requests...
+const RATE_WINDOW_MS = 10 * 60 * 1000; // ...per 10 minutes per user
+const recentCalls = new Map();         // uid -> [timestamps]
+
+const isRateLimited = (uid) => {
+    const now = Date.now();
+    const calls = (recentCalls.get(uid) || []).filter((t) => now - t < RATE_WINDOW_MS);
+    const limited = calls.length >= RATE_LIMIT;
+    if (!limited) calls.push(now);
+    recentCalls.set(uid, calls);
+    if (recentCalls.size > 5000) {
+        // Keep memory bounded: drop the oldest entries
+        for (const key of Array.from(recentCalls.keys()).slice(0, 1000)) recentCalls.delete(key);
+    }
+    return limited;
+};
+
 // Initialize Gemini. The system prompt goes in systemInstruction (not
 // concatenated with user text) so a worry can't rewrite the Baku's rules.
 const genAI = new GoogleGenerativeAI(GEN_AI_KEY || "dummy-key");
@@ -53,6 +73,13 @@ exports.processWorry = functions.runWith({ maxInstances: 3 }).https.onCall(async
         throw new functions.https.HttpsError(
             'failed-precondition',
             'The function must be called from an App Check verified app.'
+        );
+    }
+
+    if (isRateLimited(context.auth.uid)) {
+        throw new functions.https.HttpsError(
+            "resource-exhausted",
+            "The Baku is full. Rest a while and return later."
         );
     }
 
