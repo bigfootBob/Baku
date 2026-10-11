@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
         minHeight: 100,
         textAlignVertical: 'top',
         borderWidth: 1,
-        borderColor: '#C3BCA5', // Subtle border
+        borderColor: '#857B69', // 3:1+ against page and input (WCAG 1.4.11)
         shadowOpacity: 0,
     },
     honeypot: {
