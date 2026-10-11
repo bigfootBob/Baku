@@ -47,7 +47,13 @@ export function LevelUpCelebration({ visible, level, onClose }: LevelUpCelebrati
     if (!visible && !showFireworks) return null;
 
     return (
-        <Modal transparent visible={visible || showFireworks} animationType="fade">
+        <Modal
+            transparent
+            visible={visible || showFireworks}
+            animationType="fade"
+            aria-label={`Level up: you have reached level ${level}`}
+            onRequestClose={onClose} // Escape / Android back closes it
+        >
             <View style={styles.overlay}>
                 {Platform.OS === 'web' && showFireworks && (
                     <div className="fireworks-container" aria-hidden="true">
