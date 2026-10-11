@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tailwind's preflight forces placeholders to gray-400 (2:1 on our input),
+   overriding React Native's placeholderTextColor. Defer to the prop. */
+input::placeholder,
+textarea::placeholder {
+  color: var(--placeholderTextColor, #6B6358);
+}
+
 @keyframes spinOnce {
   from {
     transform: rotate(0deg);
