@@ -21,7 +21,7 @@ const STEPS = [
     },
     {
         title: "Let Go",
-        description: "I will devour your worry. It will be gone forever. Safe.",
+        description: "I will devour your worry. Let it go, and rest.",
         image: require('@/assets/images/baku-ready.webp'),
     },
 ];
