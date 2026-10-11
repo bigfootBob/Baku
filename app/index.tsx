@@ -128,11 +128,12 @@ export default function HomeScreen() {
                                 />
                             </View>
                         )}
+                        <Text style={styles.inputLabel} nativeID="worry-label">What burdens you?</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="What burdens you?"
-                            placeholderTextColor="#888"
-                            accessibilityLabel="Worry input field"
+                            placeholder="A sentence is enough..."
+                            placeholderTextColor="#6B6358"
+                            accessibilityLabel="What burdens you?"
                             accessibilityHint="Type the worry or burden you wish to feed to the Baku"
                             multiline
                             maxLength={280}
@@ -262,6 +263,12 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 680, // User requested 680 instead of 450
         marginHorizontal: 'auto', // Better centering approach across platforms
+    },
+    inputLabel: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#3B2F2F',
+        marginBottom: 8,
     },
     input: {
         backgroundColor: '#EBE5D0', // Slightly darker washi paper for depth
