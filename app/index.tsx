@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Pressable, Keyboard, Platform, TouchableWithoutFeedback, ActivityIndicator, Image, Linking, ScrollView } from 'react-native';
 import { Onboarding } from '@/components/Onboarding';
 import { BakuCharacter } from '@/components/BakuCharacter';
@@ -20,6 +20,16 @@ export default function HomeScreen() {
     const [response, setResponse] = useState<string | null>(null);
     const [showLevelUp, setShowLevelUp] = useState(false);
     const [previousLevel, setPreviousLevel] = useState(level);
+    const restButtonRef = useRef<any>(null);
+    const inputRef = useRef<TextInput>(null);
+
+    // Keyboard/screen-reader users: when the Baku answers, move focus to the
+    // "Rest" button instead of letting it fall back to the top of the page.
+    useEffect(() => {
+        if (response && Platform.OS === 'web') {
+            restButtonRef.current?.focus?.();
+        }
+    }, [response]);
 
     // Track level changes
     React.useEffect(() => {
@@ -56,6 +66,10 @@ export default function HomeScreen() {
     const resetLoop = () => {
         setResponse(null);
         setBakuState('SLEEPING');
+        if (Platform.OS === 'web') {
+            // Return focus to the input once it re-mounts
+            setTimeout(() => inputRef.current?.focus(), 0);
+        }
     };
 
     if (loading) {
@@ -87,10 +101,15 @@ export default function HomeScreen() {
 
                 <View style={styles.stage}>
                     <BakuCharacter state={bakuState} />
-                    {response && (
-                        <View style={styles.responseContainer}>
-                            <Text style={styles.responseText}>{response}</Text>
+                    <View style={response ? styles.responseContainer : undefined}>
+                        {/* Persistent live region so screen readers announce the Baku's reply */}
+                        <View accessibilityLiveRegion="polite" aria-live="polite">
+                            {response && <Text style={styles.responseText}>{response}</Text>}
+                        </View>
+                        {response && (
+                        <>
                             <TouchableOpacity
+                                ref={restButtonRef}
                                 onPress={resetLoop}
                                 style={styles.resetButton}
                                 activeOpacity={0.7}
@@ -108,8 +127,9 @@ export default function HomeScreen() {
                             >
                                 <Text style={styles.exploreButtonText}>Explore the Uncanny</Text>
                             </TouchableOpacity>
-                        </View>
-                    )}
+                        </>
+                        )}
+                    </View>
                 </View>
 
                 {!response && (
@@ -130,6 +150,7 @@ export default function HomeScreen() {
                         )}
                         <Text style={styles.inputLabel} nativeID="worry-label">What burdens you?</Text>
                         <TextInput
+                            ref={inputRef}
                             style={styles.input}
                             placeholder="A sentence is enough..."
                             placeholderTextColor="#6B6358"
