@@ -58,7 +58,7 @@ export function LevelUpCelebration({ visible, level, onClose }: LevelUpCelebrati
                 )}
 
                 <Animated.View style={[styles.container, isMobile && styles.containerMobile, animatedStyle]}>
-                    <Text style={styles.title}>Level Up!</Text>
+                    <Text style={styles.title} accessibilityRole="header">Level Up!</Text>
                     <View style={[styles.imageWrapper, isMobile && styles.imageWrapperMobile]}>
                         <Image
                             source={lvlupImages}
@@ -77,6 +77,7 @@ export function LevelUpCelebration({ visible, level, onClose }: LevelUpCelebrati
                             pressed && styles.buttonPressed,
                         ]}
                         onPress={onClose}
+                        accessibilityRole="button"
                     >
                         <Text style={styles.buttonText}>Continue</Text>
                     </Pressable>

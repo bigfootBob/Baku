@@ -85,7 +85,7 @@ export default function HomeScreen() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} role="main">
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, paddingBottom: Platform.OS === 'web' ? 60 : 120 }} keyboardShouldPersistTaps="handled">
                 <View style={styles.header}>
                     <PodcastHeader showTitle={true} />
