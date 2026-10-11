@@ -50,7 +50,7 @@ export function LevelUpCelebration({ visible, level, onClose }: LevelUpCelebrati
         <Modal transparent visible={visible || showFireworks} animationType="fade">
             <View style={styles.overlay}>
                 {Platform.OS === 'web' && showFireworks && (
-                    <div className="fireworks-container">
+                    <div className="fireworks-container" aria-hidden="true">
                         <div className="firework"></div>
                         <div className="firework"></div>
                         <div className="firework"></div>

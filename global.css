@@ -51,7 +51,8 @@
   --x: -50%;
   --initialY: 60vmin;
   content: "";
-  animation: firework 2s infinite;
+  /* Finite run (<5s) so it stops on its own (WCAG 2.2.2) */
+  animation: firework 2s 2 forwards;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -156,4 +157,14 @@
   height: 100%;
   pointer-events: none;
   z-index: 999;
+}
+/* Respect the OS "reduce motion" setting (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  .fireworks-container {
+    display: none;
+  }
+
+  .logo-container:hover .logo-image {
+    animation: none;
+  }
 }
