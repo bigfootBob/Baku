@@ -15,7 +15,14 @@ export const processWorry = async (text: string, botField: string = ''): Promise
             timeout: 30000, // don't leave the Baku "devouring" forever
         });
 
-        const result = await processWorryFn({ text, botField });
+        // Hard stop: the callable's own timeout doesn't cover waiting for an
+        // App Check (reCAPTCHA) token, which can hang if reCAPTCHA is blocked.
+        const result = await Promise.race([
+            processWorryFn({ text, botField }),
+            new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('Request timed out')), 35000)
+            ),
+        ]);
         return result.data.response;
 
     } catch (error: any) {
