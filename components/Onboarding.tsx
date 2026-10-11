@@ -21,7 +21,7 @@ const STEPS = [
     },
     {
         title: "Let Go",
-        description: "I will devour your worry. It will be gone forever. Safe.",
+        description: "I will devour your worry. Let it go, and rest.",
         image: require('@/assets/images/baku-ready.webp'),
     },
 ];
@@ -41,14 +41,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     };
 
     return (
-        <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]} role="main">
             <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} bounces={false}>
                 <PodcastHeader showTitle={true} />
-                <View
-                    style={styles.content}
-                    accessible={true}
-                    accessibilityLabel={`${STEPS[step].title}. ${STEPS[step].description}`}
-                >
+                {/* Live region so screen readers hear the new step after "Next" */}
+                <View style={styles.content} accessibilityLiveRegion="polite" aria-live="polite">
                     <View style={[styles.imageContainer, isMobile && styles.imageContainerMobile]}>
                         <Image
                             source={STEPS[step].image}
@@ -58,7 +55,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                             accessibilityLabel={`Illustration of Baku for: ${STEPS[step].title}`}
                         />
                     </View>
-                    <Text style={styles.title}>{STEPS[step].title}</Text>
+                    <Text style={styles.stepIndicator}>Step {step + 1} of {STEPS.length}</Text>
+                    <Text style={styles.title} accessibilityRole="header" aria-level={2}>{STEPS[step].title}</Text>
                     <Text style={styles.description}>{STEPS[step].description}</Text>
                 </View>
                 <TouchableOpacity
@@ -113,6 +111,12 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
+    },
+    stepIndicator: {
+        fontSize: 14,
+        color: '#5B6F5F',
+        marginBottom: 8,
+        letterSpacing: 1,
     },
     title: {
         fontSize: 28,

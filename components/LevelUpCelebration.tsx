@@ -47,10 +47,16 @@ export function LevelUpCelebration({ visible, level, onClose }: LevelUpCelebrati
     if (!visible && !showFireworks) return null;
 
     return (
-        <Modal transparent visible={visible || showFireworks} animationType="fade">
+        <Modal
+            transparent
+            visible={visible || showFireworks}
+            animationType="fade"
+            aria-label={`Level up: you have reached level ${level}`}
+            onRequestClose={onClose} // Escape / Android back closes it
+        >
             <View style={styles.overlay}>
                 {Platform.OS === 'web' && showFireworks && (
-                    <div className="fireworks-container">
+                    <div className="fireworks-container" aria-hidden="true">
                         <div className="firework"></div>
                         <div className="firework"></div>
                         <div className="firework"></div>
@@ -58,7 +64,7 @@ export function LevelUpCelebration({ visible, level, onClose }: LevelUpCelebrati
                 )}
 
                 <Animated.View style={[styles.container, isMobile && styles.containerMobile, animatedStyle]}>
-                    <Text style={styles.title}>Level Up!</Text>
+                    <Text style={styles.title} accessibilityRole="header">Level Up!</Text>
                     <View style={[styles.imageWrapper, isMobile && styles.imageWrapperMobile]}>
                         <Image
                             source={lvlupImages}
@@ -77,6 +83,7 @@ export function LevelUpCelebration({ visible, level, onClose }: LevelUpCelebrati
                             pressed && styles.buttonPressed,
                         ]}
                         onPress={onClose}
+                        accessibilityRole="button"
                     >
                         <Text style={styles.buttonText}>Continue</Text>
                     </Pressable>

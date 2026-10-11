@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Pressable, Keyboard, Platform, TouchableWithoutFeedback, ActivityIndicator, Image, Linking, ScrollView } from 'react-native';
 import { Onboarding } from '@/components/Onboarding';
 import { BakuCharacter } from '@/components/BakuCharacter';
@@ -20,6 +20,16 @@ export default function HomeScreen() {
     const [response, setResponse] = useState<string | null>(null);
     const [showLevelUp, setShowLevelUp] = useState(false);
     const [previousLevel, setPreviousLevel] = useState(level);
+    const restButtonRef = useRef<any>(null);
+    const inputRef = useRef<TextInput>(null);
+
+    // Keyboard/screen-reader users: when the Baku answers, move focus to the
+    // "Rest" button instead of letting it fall back to the top of the page.
+    useEffect(() => {
+        if (response && Platform.OS === 'web') {
+            restButtonRef.current?.focus?.();
+        }
+    }, [response]);
 
     // Track level changes
     React.useEffect(() => {
@@ -56,6 +66,10 @@ export default function HomeScreen() {
     const resetLoop = () => {
         setResponse(null);
         setBakuState('SLEEPING');
+        if (Platform.OS === 'web') {
+            // Return focus to the input once it re-mounts
+            setTimeout(() => inputRef.current?.focus(), 0);
+        }
     };
 
     if (loading) {
@@ -71,7 +85,7 @@ export default function HomeScreen() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} role="main">
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, paddingBottom: Platform.OS === 'web' ? 60 : 120 }} keyboardShouldPersistTaps="handled">
                 <View style={styles.header}>
                     <PodcastHeader showTitle={true} />
@@ -87,10 +101,15 @@ export default function HomeScreen() {
 
                 <View style={styles.stage}>
                     <BakuCharacter state={bakuState} />
-                    {response && (
-                        <View style={styles.responseContainer}>
-                            <Text style={styles.responseText}>{response}</Text>
+                    <View style={response ? styles.responseContainer : undefined}>
+                        {/* Persistent live region so screen readers announce the Baku's reply */}
+                        <View accessibilityLiveRegion="polite" aria-live="polite">
+                            {response && <Text style={styles.responseText}>{response}</Text>}
+                        </View>
+                        {response && (
+                        <>
                             <TouchableOpacity
+                                ref={restButtonRef}
                                 onPress={resetLoop}
                                 style={styles.resetButton}
                                 activeOpacity={0.7}
@@ -108,28 +127,34 @@ export default function HomeScreen() {
                             >
                                 <Text style={styles.exploreButtonText}>Explore the Uncanny</Text>
                             </TouchableOpacity>
-                        </View>
-                    )}
+                        </>
+                        )}
+                    </View>
                 </View>
 
                 {!response && (
                     <View style={styles.inputContainer}>
                         {Platform.OS === 'web' && (
-                            <TextInput
-                                style={styles.honeypot}
-                                autoComplete="off"
-                                value={botField}
-                                onChangeText={setBotField}
-                                tabIndex={-1}
-                                accessibilityElementsHidden={true}
-                                importantForAccessibility="no"
-                            />
+                            // Honeypot: hidden from sighted users AND assistive tech
+                            <View aria-hidden={true} style={styles.honeypot}>
+                                <TextInput
+                                    autoComplete="off"
+                                    value={botField}
+                                    onChangeText={setBotField}
+                                    tabIndex={-1}
+                                    accessibilityLabel="Leave this field empty"
+                                    accessibilityElementsHidden={true}
+                                    importantForAccessibility="no-hide-descendants"
+                                />
+                            </View>
                         )}
+                        <Text style={styles.inputLabel} nativeID="worry-label">What burdens you?</Text>
                         <TextInput
+                            ref={inputRef}
                             style={styles.input}
-                            placeholder="What burdens you?"
-                            placeholderTextColor="#888"
-                            accessibilityLabel="Worry input field"
+                            placeholder="A sentence is enough..."
+                            placeholderTextColor="#6B6358"
+                            accessibilityLabel="What burdens you?"
                             accessibilityHint="Type the worry or burden you wish to feed to the Baku"
                             multiline
                             maxLength={280}
@@ -260,6 +285,12 @@ const styles = StyleSheet.create({
         maxWidth: 680, // User requested 680 instead of 450
         marginHorizontal: 'auto', // Better centering approach across platforms
     },
+    inputLabel: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#3B2F2F',
+        marginBottom: 8,
+    },
     input: {
         backgroundColor: '#EBE5D0', // Slightly darker washi paper for depth
         borderRadius: 4, // More square edges
@@ -269,7 +300,7 @@ const styles = StyleSheet.create({
         minHeight: 100,
         textAlignVertical: 'top',
         borderWidth: 1,
-        borderColor: '#C3BCA5', // Subtle border
+        borderColor: '#857B69', // 3:1+ against page and input (WCAG 1.4.11)
         shadowOpacity: 0,
     },
     honeypot: {
