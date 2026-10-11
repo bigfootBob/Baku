@@ -22,7 +22,7 @@ test.describe('Accessibility Audits', () => {
     test('Home Screen should pass WCAG', async ({ page }) => {
         // Skip onboarding
         await page.goto('/');
-        await page.evaluate(() => window.localStorage.setItem('has_seen_baku_onboarding', 'true'));
+        await page.evaluate(() => window.localStorage.setItem('hasSeenOnboarding', 'true'));
         await page.goto('/');
 
         // Wait for home screen to load
