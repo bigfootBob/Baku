@@ -115,15 +115,18 @@ export default function HomeScreen() {
                 {!response && (
                     <View style={styles.inputContainer}>
                         {Platform.OS === 'web' && (
-                            <TextInput
-                                style={styles.honeypot}
-                                autoComplete="off"
-                                value={botField}
-                                onChangeText={setBotField}
-                                tabIndex={-1}
-                                accessibilityElementsHidden={true}
-                                importantForAccessibility="no"
-                            />
+                            // Honeypot: hidden from sighted users AND assistive tech
+                            <View aria-hidden={true} style={styles.honeypot}>
+                                <TextInput
+                                    autoComplete="off"
+                                    value={botField}
+                                    onChangeText={setBotField}
+                                    tabIndex={-1}
+                                    accessibilityLabel="Leave this field empty"
+                                    accessibilityElementsHidden={true}
+                                    importantForAccessibility="no-hide-descendants"
+                                />
+                            </View>
                         )}
                         <TextInput
                             style={styles.input}
