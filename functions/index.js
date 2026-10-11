@@ -59,7 +59,13 @@ const model = genAI.getGenerativeModel({
     systemInstruction: SYSTEM_PROMPT,
 });
 
-exports.processWorry = functions.runWith({ maxInstances: 3 }).https.onCall(async (data, context) => {
+exports.processWorry = functions.runWith({
+    maxInstances: 3,
+    // App Check replay protection: each token works once, so a captured
+    // token can't be reused by a script to hammer the function.
+    enforceAppCheck: true,
+    consumeAppCheckToken: true,
+}).https.onCall(async (data, context) => {
     // Check authentication
     if (!context.auth) {
         throw new functions.https.HttpsError(
@@ -68,8 +74,8 @@ exports.processWorry = functions.runWith({ maxInstances: 3 }).https.onCall(async
         );
     }
 
-    // Verify Firebase App Check token
-    if (context.app === undefined) {
+    // Verify Firebase App Check token (and that it hasn't been used before)
+    if (context.app === undefined || context.app.alreadyConsumed) {
         throw new functions.https.HttpsError(
             'failed-precondition',
             'The function must be called from an App Check verified app.'

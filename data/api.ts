@@ -10,7 +10,10 @@ if (process.env.NODE_ENV === 'development') {
 
 export const processWorry = async (text: string, botField: string = ''): Promise<string> => {
     try {
-        const processWorryFn = httpsCallable<{ text: string; botField: string }, { response: string }>(functions, 'processWorry');
+        const processWorryFn = httpsCallable<{ text: string; botField: string }, { response: string }>(functions, 'processWorry', {
+            limitedUseAppCheckTokens: true, // pairs with consumeAppCheckToken on the server
+            timeout: 30000, // don't leave the Baku "devouring" forever
+        });
 
         const result = await processWorryFn({ text, botField });
         return result.data.response;
@@ -21,6 +24,10 @@ export const processWorry = async (text: string, botField: string = ''): Promise
         // httpsCallable errors map to standard Firebase HTTP error codes
         if (error.code === 'functions/unauthenticated') {
             return "The Baku awaits a known soul. (Please log in)";
+        }
+
+        if (error.code === 'functions/resource-exhausted') {
+            return "The Baku is full. Rest a while and return later.";
         }
 
         if (process.env.NODE_ENV === 'development') {
