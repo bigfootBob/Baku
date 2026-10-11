@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const functions = require("firebase-functions/v1"); // v1 API (runWith / onCall(data, context)) on firebase-functions v7
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require('dotenv').config();
 
